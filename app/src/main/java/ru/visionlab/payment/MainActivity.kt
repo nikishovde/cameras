@@ -18,24 +18,24 @@ import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
 
     companion object {
         private val REQUEST_CAMERA_PERMISSION = 1
         private val TAG = this.javaClass.canonicalName
 
-//        init {
-//            try {
-//                System.loadLibrary("c++_shared");
-//                System.loadLibrary("wrapper");
-//                System.loadLibrary("flower");
-//                System.loadLibrary("FaceEngineSDK");
-//                System.loadLibrary("TrackEngineSDK");
-//            } catch (e: UnsatisfiedLinkError) {
-//                Log.e("Luna Mobile", "Native library failed to load: $e");
-//                System.exit(1);
-//            }
-//        }
+        init {
+            try {
+                System.loadLibrary("c++_shared");
+                System.loadLibrary("wrapper");
+                System.loadLibrary("flower");
+                System.loadLibrary("FaceEngineSDK");
+                System.loadLibrary("TrackEngineSDK");
+            } catch (e: UnsatisfiedLinkError) {
+                Log.e("Luna Mobile", "Native library failed to load: $e");
+                System.exit(1);
+            }
+        }
     }
 
     private lateinit var rs: RenderScript
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         rs = RenderScript.create(this)
         rsSetup()
 
-//        unpackResourcesAndInitFaceEngine()
+        unpackResourcesAndInitFaceEngine()
         requestCameraPermission()
         resume.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
@@ -115,24 +115,16 @@ class MainActivity : AppCompatActivity() {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
 
-                    rgbCamera = getCameraInstance(0)!!
+                    rgbCamera = getCameraInstance(1)!!
                     configureCamera(rgbCamera!!)
                     configureRgbCameraPreview()
-                    rgbCamera!!.setPreviewCallback(null) //andrew
-                    rgbCamera!!.setDisplayOrientation(270)
-                    rgbCamera!!.setPreviewDisplay(camera_surface.holder)
+                    rgbCamera!!.setPreviewCallback(this) //andrew
 
-                    rgbCamera!!.startPreview()
-                    rgbCameraDataCallback()
-
-                    irCamera = getCameraInstance(1)!!
+                    irCamera = getCameraInstance(0)!!
                     configureCamera(irCamera!!)
-////                    startIrCameraPreview()
-
-                    irCamera!!.setPreviewCallback(null) //andrew
-                    irCamera!!.setDisplayOrientation(270)
-                    irCamera!!.setPreviewTexture(fakeSurfaceTexture)
-                    irCamera!!.startPreview()
+                    startIrCameraPreview()
+//                    irCamera!!.setPreviewTexture(fakeSurfaceTexture)
+//                    irCamera!!.startPreview()
                     irCameraDataCallback()
 
 //                    autoPause()
@@ -158,7 +150,6 @@ class MainActivity : AppCompatActivity() {
     private fun configureCamera(camera: Camera) {
         camera.parameters?.apply {
             setPreviewSize(640, 480)
-            set("video-size", "640x480")
         }?.also {
             camera.apply {
                 this.parameters = it
@@ -169,15 +160,17 @@ class MainActivity : AppCompatActivity() {
     private fun startIrCameraPreview() {
         irCamera?.run {
             stopPreview()
-            setPreviewDisplay(camera_surface.holder)
+            setPreviewTexture(fakeSurfaceTexture)
             startPreview()
         }
     }
 
     private fun startBestshotCameraPreview(holder: SurfaceTexture) {
         rgbCamera?.run {
-//            stopPreview()
+            stopPreview()
             setPreviewTexture(holder)
+            addCallbackBuffer(bestShotCallbackBuffer)
+            setPreviewCallbackWithBuffer(this@MainActivity)
             startPreview()
         }
     }
@@ -212,9 +205,9 @@ class MainActivity : AppCompatActivity() {
     private fun irCameraDataCallback() {
         irCamera?.setPreviewCallback { data, camera ->
             Log.d(this.javaClass.canonicalName, "Ir camera data size = ${data.size}")
-            rsIrInAllocation.copyFrom(data)
-            yuvToIrIntrinsic.forEach(rsIrOutAllocation)
-            rsIrOutAllocation.copyTo(previewIrFrame)
+//            rsIrInAllocation.copyFrom(data)
+//            yuvToIrIntrinsic.forEach(rsIrOutAllocation)
+//            rsIrOutAllocation.copyTo(previewIrFrame)
 
 //            irFrameSemaphor = true
             if (irFrameCopyDataSemaphor) {
@@ -262,7 +255,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
+    override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
         Log.d(this.javaClass.canonicalName, "Rgb camera data size = ${data!!.size}")
 
         rsRgbInAllocation.copyFrom(data)
@@ -280,7 +273,7 @@ class MainActivity : AppCompatActivity() {
             irFrameCopyDataSemaphor = true
         }
 
-//        camera?.addCallbackBuffer(bestShotCallbackBuffer)
+        camera?.addCallbackBuffer(bestShotCallbackBuffer)
     }
 
     fun pause() {

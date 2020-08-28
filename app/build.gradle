@@ -14,17 +14,17 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-//        externalNativeBuild {
-//            cmake {
-//                cppFlags "-std=c++11"
-//                abiFilters 'arm64-v8a'
-//
-//                arguments "-DANDROID_STL=c++_shared",
-//                        "-DFSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_v.3.10.0",
-//                        "-DTSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_v.3.10.0",
-//                        "-DFSDK_EXAMPLES=${rootDir}/app/luna-sdk_droid_rel_v.3.10.0/examples"
-//            }
-//        }
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+                abiFilters 'arm64-v8a'
+
+                arguments "-DANDROID_STL=c++_shared",
+                        "-DFSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
+                        "-DTSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
+                        "-DFSDK_EXAMPLES=${rootDir}/app/luna-sdk_droid_rel_test/examples"
+            }
+        }
     }
 
     buildTypes {
@@ -34,11 +34,11 @@ android {
         }
     }
 
-//    externalNativeBuild {
-//        cmake {
-//            path "src/main/jni/CMakeLists.txt"
-//        }
-//    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/jni/CMakeLists.txt"
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -46,7 +46,7 @@ android {
 }
 
 copy {
-    from( "${rootDir}/app/luna-sdk_droid_rel_v.3.10.0/data") {
+    from( "${rootDir}/app/luna-sdk_droid_rel_test/data") {
         include 'license.conf'
         include 'runtime.conf'
         include 'faceengine.conf'
@@ -56,6 +56,9 @@ copy {
         include 'pdmcfg.bin'
         include 'ir_rgb_liveness_pos_v1_arm.plan'
         include 'ir_rgb_liveness_pos_v1_cpu.plan'
+        include 'FaceDet_v1_first*'
+        include 'FaceDet_v1_second*'
+        include 'FaceDet_v1_third*'
         include 'FaceDet_v2*.plan'
         include 'LNet_fast_v2_arm.plan'
         include 'angle_estimation_flwr_arm.plan'
