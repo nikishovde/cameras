@@ -150,6 +150,12 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
     private fun configureCamera(camera: Camera) {
         camera.parameters?.apply {
             setPreviewSize(640, 480)
+            if (camera == rgbCamera) {
+                val flashModes = supportedFlashModes
+                if (flashModes != null && flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
+                    flashMode = Camera.Parameters.FLASH_MODE_OFF
+                }
+            }
         }?.also {
             camera.apply {
                 this.parameters = it

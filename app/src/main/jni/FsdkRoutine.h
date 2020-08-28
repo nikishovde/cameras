@@ -331,8 +331,8 @@ struct TECallbacks : tsdk::IBestShotObserver, tsdk::IBestShotPredicate {
         LOG_INFO("TrackEngineCallbacks", "IRRGB irFrame: height: %d, width: %d",
                  irFrame.getHeight(), irFrame.getWidth());
 
-        fsdk::Image imageIRasRGB = irFrame;
-        imageIRasRGB.convert(imageIRasRGB, fsdk::Format::R8G8B8);
+        fsdk::Image imageIRasRGB;
+        irFrame.convert(imageIRasRGB, fsdk::Format::R8G8B8);
 
         if (!imageIRasRGB.isValid()) {
             LOG_FATAL("TrackEngineCallbacks", "IRRGB fail to convert ir to rgb.");
