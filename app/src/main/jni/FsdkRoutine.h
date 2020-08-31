@@ -4,7 +4,6 @@
 #include <stdarg.h>
 
 #include <fsdk/FaceEngine.h>
-#include <lsdk/LivenessEngine.h>
 #include <fsdk/IRefCounted.h>
 #include <fsdk/Types/ResultValue.h>
 #include <trackEngine/ITrackEngine.h>
@@ -24,7 +23,6 @@
 #include"Timer.h"
 
 using namespace fsdk;
-using namespace lsdk;
 using namespace tsdk;
 using namespace std::chrono;
 using ITrackEnginePtr = fsdk::Ref<tsdk::ITrackEngine>;
@@ -32,7 +30,6 @@ using IStreamPtr = fsdk::Ref<tsdk::IStream>;
 
 static IFaceEnginePtr engine = nullptr;
 static ITrackEnginePtr t_engine = nullptr;
-static ILivenessEnginePtr l_engine = nullptr;
 static IDetectorPtr detector = nullptr;
 static IDetectorPtr detector_v3 = nullptr;
 
@@ -503,13 +500,6 @@ static int initFaceEngine(char const *dataPath,
 
     if (!t_engine) {
         LOG_FATAL("[INIT FACEENGINE]", "Failed to create track engine instance.: \n");
-        return OBJ_CREATION_FAILED;
-    }
-
-    l_engine = acquire(createLivenessEngine(engine, dataPath));
-
-    if (!l_engine) {
-        LOG_FATAL("[INIT FACEENGINE]", "Failed to create liveness engine instance.: \n");
         return OBJ_CREATION_FAILED;
     }
 

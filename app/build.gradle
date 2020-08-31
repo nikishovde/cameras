@@ -20,9 +20,9 @@ android {
                 abiFilters 'arm64-v8a'
 
                 arguments "-DANDROID_STL=c++_shared",
-                        "-DFSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
-                        "-DTSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
-                        "-DFSDK_EXAMPLES=${rootDir}/app/luna-sdk_droid_rel_test/examples"
+                        "-DFSDK_ROOT=${rootDir}/app/luna-sdk_droid_dbg",
+                        "-DTSDK_ROOT=${rootDir}/app/luna-sdk_droid_dbg",
+                        "-DFSDK_EXAMPLES=${rootDir}/app/luna-sdk_droid_dbg/examples"
             }
         }
     }

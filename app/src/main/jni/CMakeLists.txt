@@ -23,9 +23,6 @@ set_property(TARGET faceSdkEngine_prebuilt PROPERTY IMPORTED_LOCATION "${FSDK_RO
 add_library(flower_prebuilt SHARED IMPORTED)
 set_property(TARGET flower_prebuilt PROPERTY IMPORTED_LOCATION "${FSDK_ROOT}/lib/clang/${ANDROID_ABI}/libflower.so")
 
-add_library(livenessSdkEngine_prebuilt SHARED IMPORTED)
-set_property(TARGET livenessSdkEngine_prebuilt PROPERTY IMPORTED_LOCATION "${FSDK_ROOT}/lib/clang/${ANDROID_ABI}/libLivenessEngineSDK.so")
-
 add_library(trackEngine_prebuilt SHARED IMPORTED)
 set_property(TARGET trackEngine_prebuilt PROPERTY IMPORTED_LOCATION "${FSDK_ROOT}/lib/clang/${ANDROID_ABI}/libTrackEngineSDK.so")
 
@@ -35,6 +32,5 @@ target_link_libraries( wrapper PUBLIC
 		trackEngine_prebuilt
 		faceSdkEngine_prebuilt
 		flower_prebuilt
-		livenessSdkEngine_prebuilt
 		${loglib}
 		)
