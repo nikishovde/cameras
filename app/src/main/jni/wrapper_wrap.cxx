@@ -256,6 +256,56 @@ Java_ru_visionlab_payment_MainActivity_pushByteBuffer(
 }
 
 JNIEXPORT void JNICALL
+Java_ru_visionlab_payment_MainActivity_startDetecting(JNIEnv *env, jobject thiz) {
+    fsdk::Image image_rgb;
+    image_rgb.load("/sdcard/DCIM/detection_rgb.png", fsdk::Format::R8G8B8);
+    fsdk::Image image_ir;
+    image_ir.load("/sdcard/DCIM/detection_ir.png", fsdk::Format::R8);
+
+    isPushing = true;
+    bool isFrameAppended;
+    while(isPushing) {
+        auto frameData = new FrameData();
+        LOG_INFO("TrackEngine","Pushing frame %d ", frameCounter);
+        frameData->irImage = image_ir;
+        isFrameAppended = stream->pushFrame(image_rgb, frameCounter, frameData);
+        frameCounter++;
+        if(!isFrameAppended)
+        {
+            LOG_WARN("TrackEngine", "Frame  %d was skipped! Image queue is full!", frameCounter);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_ru_visionlab_payment_MainActivity_stopDetecting(JNIEnv *env, jobject thiz) {
+    isPushing = false;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_visionlab_payment_MainActivity_saveFrame(JNIEnv *env, jobject thiz, jobject frame_data,
+                                                 jint current_camera) {
+
+    LOG_INFO("TrackEngine","Saving for %i camera", current_camera);
+    if (current_camera == 0) {
+        fsdk::Image imageRGB( 640, 480, fsdk::Format::R8G8B8X8,
+                             env->GetDirectBufferAddress(frame_data));
+        fsdk::Image image_rgb;
+        imageRGB.convert(image_rgb, fsdk::Format::R8G8B8);
+
+        image_rgb.save("/sdcard/DCIM/detection_rgb.png");
+        LOG_INFO("TrackEngine","Rgb Camera. Saved image with size %d", image_rgb.getDataSize());
+    } else {
+        fsdk::Image imageIR( 640, 480, fsdk::Format::R8G8B8X8, env->GetDirectBufferAddress(frame_data));
+        fsdk::Image image_ir;
+        imageIR.convert(image_ir, fsdk::Format::R8);
+        image_ir.save("/sdcard/DCIM/detection_ir.png");
+        LOG_INFO("TrackEngine","Ir Camera. Saved image with size %d", image_ir.getDataSize());
+    }
+}
+
+JNIEXPORT void JNICALL
 Java_ru_visionlab_payment_MainActivity_resetCounter(JNIEnv *env, jobject thiz) {
     live_frames_count = 10;
 }

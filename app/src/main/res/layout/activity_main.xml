@@ -6,15 +6,37 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/rgbCamera"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="rgb on"
+        app:layout_constraintBottom_toTopOf="@+id/preview_container"
+        app:layout_constraintEnd_toStartOf="@+id/detect" />
+
+    <Button
+        android:id="@+id/detect"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="24dp"
+        android:text="detect"
+        android:enabled="false"
+        app:layout_constraintBottom_toTopOf="@+id/preview_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <Button
+        android:id="@+id/irCamera"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="ir on"
+        app:layout_constraintBottom_toTopOf="@+id/preview_container"
+        app:layout_constraintStart_toEndOf="@+id/detect" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/preview_container"
@@ -25,33 +47,46 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <SurfaceView
             android:id="@+id/camera_surface"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
     </androidx.cardview.widget.CardView>
 
     <Button
         android:id="@+id/pause"
-        android:text="pause"
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_marginStart="100dp"
-        android:layout_marginBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginTop="24dp"
+        android:text="pause"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/preview_container" />
 
     <Button
         android:id="@+id/resume"
-        android:text="resume"
         android:layout_width="100dp"
         android:layout_height="50dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="100dp"
-        android:layout_marginBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:text="resume"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preview_container" />
+
+    <ProgressBar
+        android:id="@+id/detecting"
+        style="Widget.ProgressBar.Large"
+        android:visibility="gone"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preview_container" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

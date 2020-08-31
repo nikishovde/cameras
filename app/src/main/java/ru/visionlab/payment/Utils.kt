@@ -1,7 +1,10 @@
 package ru.visionlab.payment
 
 import android.content.Context
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.util.*
 
 object Utils {
@@ -66,6 +69,26 @@ object Utils {
             fos?.close()
         }
         return result
+    }
+
+    fun rotateClockWise(
+        rgba: ByteArray,
+        rgbaWidth: Int,
+        rgbaHeight: Int,
+        rgbOut: ByteArray
+    ) {
+        for (i in 0 until rgbaWidth) {
+            var j = 0
+            while (j < rgbaHeight * 3) {
+                rgbOut[j + rgbaHeight * 3 * i] =
+                    rgba[rgbaWidth * 4 * (rgbaHeight - (j / 3 + 1)) + i * 4]
+                rgbOut[j + 1 + rgbaHeight * 3 * i] =
+                    rgba[rgbaWidth * 4 * (rgbaHeight - (j / 3 + 1)) + 1 + i * 4]
+                rgbOut[j + 2 + rgbaHeight * 3 * i] =
+                    rgba[rgbaWidth * 4 * (rgbaHeight - (j / 3 + 1)) + 2 + i * 4]
+                j += 3
+            }
+        }
     }
 
 }

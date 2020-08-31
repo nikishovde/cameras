@@ -10,6 +10,7 @@ import android.os.CountDownTimer
 import android.renderscript.*
 import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -23,6 +24,8 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
     companion object {
         private val REQUEST_CAMERA_PERMISSION = 1
         private val TAG = this.javaClass.canonicalName
+        private val RGB_CAMERA_ID = 0
+        private val IR_CAMERA_IO = 1
 
         init {
             try {
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         }
     }
 
+    private var currentCamera = 0
     private lateinit var rs: RenderScript
 
     private lateinit var yuvToRgbIntrinsic: ScriptIntrinsicYuvToRGB
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
     private lateinit var rsRgbInAllocation: Allocation
     private lateinit var rsRgbOutAllocation: Allocation
     private lateinit var previewRGBFrame: ByteArray
+    private lateinit var previewRGBFrameRotated: ByteArray
     private lateinit var rsIrInAllocation: Allocation
     private lateinit var rsIrOutAllocation: Allocation
     private lateinit var previewIrFrame: ByteArray
@@ -76,25 +81,102 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
 
         unpackResourcesAndInitFaceEngine()
         requestCameraPermission()
-        resume.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                resume()
-                autoPause()
-            }
-        })
-        pause.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                pause()
-                autoResume()
-            }
 
-        })
 //        cputOverload()
+        setupListeners()
     }
+
+    private fun setupListeners() {
+        this.findViewById<Button>(R.id.rgbCamera).setOnClickListener {
+            pause()
+            currentCamera = RGB_CAMERA_ID
+            startRgb()
+        }
+        this.findViewById<Button>(R.id.irCamera).setOnClickListener {
+            pause()
+            currentCamera = IR_CAMERA_IO
+            startIr()
+        }
+        this.findViewById<Button>(R.id.detect).setOnClickListener {
+
+//            if (detecting.visibility == View.GONE) {
+//                CoroutineScope(Dispatchers.Default).launch() {
+//                    pause()
+//                    currentCamera = RGB_CAMERA_ID
+//                    rgbCamera = getCameraInstance(RGB_CAMERA_ID)!!
+//                    configureCamera(rgbCamera!!)
+////        configureRgbCameraPreview()
+//                    rgbCamera!!.setPreviewDisplay(camera_surface.holder)
+////        rgbCamera!!.setDisplayOrientation(270)
+//                    rgbCamera!!.startPreview()
+//                    takePhoto()
+//                    sleep(3000)
+//                    pause()
+//                    currentCamera = IR_CAMERA_IO
+//                    startIr()
+//                    takePhoto()
+//                    sleep(3000)
+//                    pause()
+//                    currentCamera = RGB_CAMERA_ID
+//                    startRgb()
+//
+//                    startDetecting()
+//                }
+//                detecting.visibility = View.VISIBLE
+//            } else {
+//                stopDetecting()
+//                detecting.visibility = View.GONE
+//            }
+        }
+//        resume.setOnClickListener(object : View.OnClickListener {
+//            override fun onClick(v: View?) {
+//                resume()
+//                autoPause()
+//            }
+//        })
+//        pause.setOnClickListener(object : View.OnClickListener {
+//            override fun onClick(v: View?) {
+//                pause()
+//                autoResume()
+//            }
+//
+//        })
+    }
+
+    private fun takePhoto() {
+        if (currentCamera == RGB_CAMERA_ID && rgbCamera != null) {
+            rgbCamera!!.setPreviewCallback { data, camera ->
+
+                Log.d(this.javaClass.canonicalName, "rgb camera data size = ${data.size}")
+                rsRgbInAllocation.copyFrom(data)
+                yuvToRgbIntrinsic.forEach(rsRgbOutAllocation)
+                rsRgbOutAllocation.copyTo(previewRGBFrame)
+
+                rgbFrame.put(previewRGBFrame)
+                saveFrame(rgbFrame, currentCamera)
+                camera.setPreviewCallback(null)
+//                rgbFrame.clear()
+            }
+        } else if (currentCamera == IR_CAMERA_IO && irCamera != null) {
+            irCamera!!.setPreviewCallback { data, camera ->
+
+                Log.d(this.javaClass.canonicalName, "ir camera data size = ${data.size}")
+                rsRgbInAllocation.copyFrom(data)
+                yuvToRgbIntrinsic.forEach(rsRgbOutAllocation)
+                rsRgbOutAllocation.copyTo(previewIrFrame)
+
+                irFrame.put(previewIrFrame)
+                saveFrame(irFrame, currentCamera)
+                camera.setPreviewCallback(null)
+//                irFrame.clear()
+            }
+        }
+    }
+
 
     fun requestCameraPermission() {
         requestPermissions(
-            arrayOf(Manifest.permission.CAMERA),
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
             REQUEST_CAMERA_PERMISSION
         )
     }
@@ -114,27 +196,39 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
                 if (grantResults.size > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
-
-                    rgbCamera = getCameraInstance(1)!!
-                    configureCamera(rgbCamera!!)
-                    configureRgbCameraPreview()
-                    rgbCamera!!.setPreviewCallback(this) //andrew
-
-                    irCamera = getCameraInstance(0)!!
-                    configureCamera(irCamera!!)
-                    startIrCameraPreview()
-//                    irCamera!!.setPreviewTexture(fakeSurfaceTexture)
-//                    irCamera!!.startPreview()
-                    irCameraDataCallback()
+                    if (currentCamera == RGB_CAMERA_ID) {
+                        startRgb()
+                    } else {
+                        startIr()
+                    }
 
 //                    autoPause()
-
 //                    pushFromFiles()
                 } else {
                 }
                 return
             }
         }
+    }
+
+    fun startRgb() {
+        rgbCamera = getCameraInstance(RGB_CAMERA_ID)!!
+        configureCamera(rgbCamera!!)
+//        configureRgbCameraPreview()
+        rgbCamera!!.setPreviewDisplay(camera_surface.holder)
+        rgbCamera!!.setDisplayOrientation(270)
+        rgbCamera!!.startPreview()
+    }
+
+    private fun startIr() {
+        irCamera = getCameraInstance(IR_CAMERA_IO)!!
+        configureCamera(irCamera!!)
+        irCamera!!.setPreviewDisplay(camera_surface.holder)
+//        irCamera!!.setDisplayOrientation(270)
+//        startIrCameraPreview()
+//                    irCamera!!.setPreviewTexture(fakeSurfaceTexture)
+//        irCameraDataCallback()
+        irCamera!!.startPreview()
     }
 
 
@@ -276,28 +370,38 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         camera?.addCallbackBuffer(bestShotCallbackBuffer)
     }
 
-    fun pause() {
-        rgbCamera!!.setPreviewCallback(null)
-        rgbCamera!!.stopPreview()
-        rgbCamera!!.release()
-        rgbCamera
 
-        irCamera!!.setPreviewCallback(null)
-        irCamera!!.stopPreview()
-        irCamera!!.release()
-        irCamera = null
+    fun pause() {
+        if (currentCamera == RGB_CAMERA_ID && rgbCamera != null) {
+            rgbCamera!!.setPreviewCallback(null)
+            rgbCamera!!.stopPreview()
+            rgbCamera!!.release()
+            rgbCamera = null
+        }
+
+        if (currentCamera == IR_CAMERA_IO && irCamera != null) {
+            irCamera!!.setPreviewCallback(null)
+            irCamera!!.stopPreview()
+            irCamera!!.release()
+            irCamera = null
+        }
     }
 
     fun resume() {
 //        resetCounter()
-        irCamera = getCameraInstance(0)!!
-        configureCamera(irCamera!!)
-        startIrCameraPreview()
-        irCameraDataCallback()
+        if (currentCamera == RGB_CAMERA_ID) {
 
-        rgbCamera = getCameraInstance(1)!!
-        configureCamera(rgbCamera!!)
-        configureRgbCameraPreview()
+            rgbCamera = getCameraInstance(RGB_CAMERA_ID)!!
+            configureCamera(rgbCamera!!)
+            configureRgbCameraPreview()
+
+        } else {
+            irCamera = getCameraInstance(IR_CAMERA_IO)!!
+            configureCamera(irCamera!!)
+            startIrCameraPreview()
+            irCameraDataCallback()
+
+        }
     }
 
     fun autoPause() {
@@ -375,6 +479,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         rsRgbInAllocation = Allocation.createTyped(rs, nv21Type)
         rsRgbOutAllocation = Allocation.createTyped(rs, rgbType)
         previewRGBFrame = ByteArray(rgbArraySize)
+        previewRGBFrameRotated = ByteArray(rgbArraySize)
         yuvToRgbIntrinsic.setInput(rsRgbInAllocation)
 
         yuvToIrIntrinsic = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs))
@@ -395,4 +500,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         rollThreshold: Float
     ): Int
     private external fun resetCounter()
+    private external fun startDetecting()
+    private external fun stopDetecting()
+    private external fun saveFrame(rgbFrame: ByteBuffer, currentCamera: Int)
 }
