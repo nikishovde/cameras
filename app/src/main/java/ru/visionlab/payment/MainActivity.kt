@@ -217,6 +217,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
 //        configureRgbCameraPreview()
         rgbCamera!!.setPreviewDisplay(camera_surface.holder)
         rgbCamera!!.setDisplayOrientation(270)
+        rgbCameraDataCallback()
         rgbCamera!!.startPreview()
     }
 
@@ -227,7 +228,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
 //        irCamera!!.setDisplayOrientation(270)
 //        startIrCameraPreview()
 //                    irCamera!!.setPreviewTexture(fakeSurfaceTexture)
-//        irCameraDataCallback()
+        irCameraDataCallback()
         irCamera!!.startPreview()
     }
 

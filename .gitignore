@@ -14,4 +14,5 @@
 .cxx
 app/luna-sdk_droid_rel_test/
 app/luna-sdk_droid_rel_v.3.10.0/
+app/luna-sdk_droid_dbg/
 app/src/main/assets/
