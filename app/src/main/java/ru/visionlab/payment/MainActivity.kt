@@ -27,18 +27,18 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         private val RGB_CAMERA_ID = 0
         private val IR_CAMERA_IO = 1
 
-        init {
-            try {
-                System.loadLibrary("c++_shared");
-                System.loadLibrary("wrapper");
-                System.loadLibrary("flower");
-                System.loadLibrary("FaceEngineSDK");
-                System.loadLibrary("TrackEngineSDK");
-            } catch (e: UnsatisfiedLinkError) {
-                Log.e("Luna Mobile", "Native library failed to load: $e");
-                System.exit(1);
-            }
-        }
+//        init {
+//            try {
+//                System.loadLibrary("c++_shared");
+//                System.loadLibrary("wrapper");
+//                System.loadLibrary("flower");
+//                System.loadLibrary("FaceEngineSDK");
+//                System.loadLibrary("TrackEngineSDK");
+//            } catch (e: UnsatisfiedLinkError) {
+//                Log.e("Luna Mobile", "Native library failed to load: $e");
+//                System.exit(1);
+//            }
+//        }
     }
 
     private var currentCamera = 0
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         rs = RenderScript.create(this)
         rsSetup()
 
-        unpackResourcesAndInitFaceEngine()
+//        unpackResourcesAndInitFaceEngine()
         requestCameraPermission()
 
 //        cputOverload()
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
                 rsRgbOutAllocation.copyTo(previewRGBFrame)
 
                 rgbFrame.put(previewRGBFrame)
-                saveFrame(rgbFrame, currentCamera)
+//                saveFrame(rgbFrame, currentCamera)
                 camera.setPreviewCallback(null)
 //                rgbFrame.clear()
             }
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
                 rsRgbOutAllocation.copyTo(previewIrFrame)
 
                 irFrame.put(previewIrFrame)
-                saveFrame(irFrame, currentCamera)
+//                saveFrame(irFrame, currentCamera)
                 camera.setPreviewCallback(null)
 //                irFrame.clear()
             }
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         irCamera = getCameraInstance(IR_CAMERA_IO)!!
         configureCamera(irCamera!!)
         irCamera!!.setPreviewDisplay(camera_surface.holder)
-//        irCamera!!.setDisplayOrientation(270)
+        irCamera!!.setDisplayOrientation(270)
 //        startIrCameraPreview()
 //                    irCamera!!.setPreviewTexture(fakeSurfaceTexture)
         irCameraDataCallback()
@@ -360,7 +360,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
         rgbFrame.clear()
         rgbFrame.put(previewRGBFrame)
         if (!irFrameCopyDataSemaphor) {
-            pushFrame(rgbFrame, irFrame, System.currentTimeMillis())
+//            pushFrame(rgbFrame, irFrame, System.currentTimeMillis())
 
 //            thread(start = true) {
 //                pushByteBuffer(previewRGBFrame, previewIrFrame, System.currentTimeMillis())
@@ -459,7 +459,7 @@ class MainActivity : AppCompatActivity(), Camera.PreviewCallback {
 
         val initCode = initFaceEngine("$filesDir/vl/data",
             0.843f, 20f, 20f, 10f)
-        Log.d(TAG, "RETURN CODE IS $initCode")
+//        Log.d(TAG, "RETURN CODE IS $initCode")
         return initCode
     }
 

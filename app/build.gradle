@@ -3,8 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "ru.visionlab.payment"
@@ -14,17 +14,17 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++11"
-                abiFilters 'arm64-v8a'
-
-                arguments "-DANDROID_STL=c++_shared",
-                        "-DFSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
-                        "-DTSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
-                        "-DFSDK_EXAMPLES=${rootDir}/app/luna-sdk_droid_rel_test/examples"
-            }
-        }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags "-std=c++11"
+//                abiFilters 'arm64-v8a'
+//
+//                arguments "-DANDROID_STL=c++_shared",
+//                        "-DFSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
+//                        "-DTSDK_ROOT=${rootDir}/app/luna-sdk_droid_rel_test",
+//                        "-DFSDK_EXAMPLES=${rootDir}/app/luna-sdk_droid_rel_test/examples"
+//            }
+//        }
     }
 
     buildTypes {
@@ -34,40 +34,40 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/jni/CMakeLists.txt"
-        }
-    }
+//    externalNativeBuild {
+//        cmake {
+//            path "src/main/jni/CMakeLists.txt"
+//        }
+//    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
-copy {
-    from( "${rootDir}/app/luna-sdk_droid_rel_test/data") {
-        include 'license.conf'
-        include 'runtime.conf'
-        include 'faceengine.conf'
-        include 'trackengine.conf'
-        include 'livenessengine.conf'
-        include 'model_subjective_quality_*.plan'
-        include 'pdmcfg.bin'
-        include 'ir_rgb_liveness_pos_v1_arm.plan'
-        include 'ir_rgb_liveness_pos_v1_cpu.plan'
-        include 'FaceDet_v1_first*'
-        include 'FaceDet_v1_second*'
-        include 'FaceDet_v1_third*'
-        include 'FaceDet_v2*.plan'
-        include 'LNet_fast_v2_arm.plan'
-        include 'angle_estimation_flwr_arm.plan'
-        include 'angle_estimation_flwr_gpu_mobile.plan'
-        include 'FaceDet_v3_6_arm.plan'
-        include 'FaceDet_v3_redetect_v2_arm.plan'
-    }
-    into 'src/main/assets/data'
-}
+//copy {
+//    from( "${rootDir}/app/luna-sdk_droid_rel_test/data") {
+//        include 'license.conf'
+//        include 'runtime.conf'
+//        include 'faceengine.conf'
+//        include 'trackengine.conf'
+//        include 'livenessengine.conf'
+//        include 'model_subjective_quality_*.plan'
+//        include 'pdmcfg.bin'
+//        include 'ir_rgb_liveness_pos_v1_arm.plan'
+//        include 'ir_rgb_liveness_pos_v1_cpu.plan'
+//        include 'FaceDet_v1_first*'
+//        include 'FaceDet_v1_second*'
+//        include 'FaceDet_v1_third*'
+//        include 'FaceDet_v2*.plan'
+//        include 'LNet_fast_v2_arm.plan'
+//        include 'angle_estimation_flwr_arm.plan'
+//        include 'angle_estimation_flwr_gpu_mobile.plan'
+//        include 'FaceDet_v3_6_arm.plan'
+//        include 'FaceDet_v3_redetect_v2_arm.plan'
+//    }
+//    into 'src/main/assets/data'
+//}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
