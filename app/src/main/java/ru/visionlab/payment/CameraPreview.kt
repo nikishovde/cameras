@@ -12,7 +12,7 @@ class CameraPreview(private val mContext: Context, private val mCamera: Camera) 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = 640
-        val height = 480
+        val height = 640
         val ratio: Float
         ratio = if (height >= width) {
             height.toFloat() / width.toFloat()

@@ -42,8 +42,9 @@ JNIEXPORT void JNICALL Java_ru_visionlab_payment_FaceEngine_setSessionParams(
 
 JNIEXPORT void JNICALL Java_ru_visionlab_payment_MainActivity_pushFrame(
         JNIEnv *env, jobject thiz, jobject rgb_frame,
-        jobject ir_frame, jlong frame_timestamp) {
+        jobject ir_frame, jlong frame_timestamp, jboolean saveRawPhotos) {
 
+    save_raw_photos = saveRawPhotos;
 
 //    if (live_frames_count <= 0) {
 //        LOG_INFO("TrackEngineCallbacks", "Frames processing completed.");
@@ -73,8 +74,8 @@ JNIEXPORT void JNICALL Java_ru_visionlab_payment_MainActivity_pushFrame(
      */
     frameData->irImage = image_ir;
 
-    bool isFrameAppended = stream->pushFrame(image_rgb, frameCounter, frameData);
-//    bool isFrameAppended = false;
+//    bool isFrameAppended = stream->pushFrame(image_rgb, frameCounter, frameData);
+    bool isFrameAppended = true;
     if(!isFrameAppended)
     {
         LOG_WARN("TrackEngine", "Frame  %d was skipped! Image queue is full!", frameCounter);
